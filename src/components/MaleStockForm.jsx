@@ -85,7 +85,7 @@ export default function MaleStockForm() {
             <TextField
               required
               fullWidth
-              label="Purchaser Information"
+              label="Purchaser Details"
               name="purchaserInformation"
               value={formData.purchaserInformation}
               onChange={handleChange}

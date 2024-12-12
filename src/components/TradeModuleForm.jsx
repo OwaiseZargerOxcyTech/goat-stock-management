@@ -11,12 +11,20 @@ import {
 } from "@mui/material";
 import api from "../api/config";
 
-export default function TradeModuleForm() {
+export default function TradeStockForm() {
   const [formData, setFormData] = useState({
     goatName: "",
-    intendedUse: "",
+    purchaserInformation: "",
+    customerDetails: "",
+    weight: "",
+    height: "",
+    entryDate: "",
+    exitDate: "",
+    salesStatus: "",
+    maintenanceRecords: "",
     price: "",
-    transactionDetails: "",
+    description: "",
+    uniqueIdentificationNumber: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,11 +32,13 @@ export default function TradeModuleForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "price") {
-      setFormData({ ...formData, [name]: parseFloat(value) || "" });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({
+      ...formData,
+      [name]:
+        name === "price" || name === "weight" || name === "height"
+          ? parseFloat(value) || ""
+          : value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -36,15 +46,23 @@ export default function TradeModuleForm() {
     setLoading(true);
     try {
       await api.post("/trade", formData);
-      setSnackbar({ open: true, message: "Trade created successfully" });
+      setSnackbar({ open: true, message: "Trade stock created successfully" });
       setFormData({
         goatName: "",
-        intendedUse: "",
+        purchaserInformation: "",
+        customerDetails: "",
+        weight: "",
+        height: "",
+        entryDate: "",
+        exitDate: "",
+        salesStatus: "",
+        maintenanceRecords: "",
         price: "",
-        transactionDetails: "",
+        description: "",
+        uniqueIdentificationNumber: "",
       });
     } catch (error) {
-      setSnackbar({ open: true, message: "Error creating trade" });
+      setSnackbar({ open: true, message: "Error creating trade stock" });
     } finally {
       setLoading(false);
     }
@@ -53,11 +71,12 @@ export default function TradeModuleForm() {
   return (
     <Container maxWidth="md" sx={{ mt: 8, mb: 8 }}>
       <Typography variant="h4" align="center" gutterBottom>
-        Trade Module Form
+        Trade Stock Form
       </Typography>
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          {/* Fields for the Form */}
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
@@ -67,21 +86,97 @@ export default function TradeModuleForm() {
               onChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              label="Purchaser Details"
+              name="purchaserInformation"
+              value={formData.purchaserInformation}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              label="Customer Details"
+              name="customerDetails"
+              value={formData.customerDetails}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              label="Weight"
+              name="weight"
+              type="number"
+              value={formData.weight}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              label="Height"
+              name="height"
+              type="number"
+              value={formData.height}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              fullWidth
+              label="Entry Date"
+              name="entryDate"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.entryDate}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Exit Date"
+              name="exitDate"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.exitDate}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
               select
-              label="Intended Use"
-              name="intendedUse"
-              value={formData.intendedUse}
+              label="Sales Status"
+              name="salesStatus"
+              value={formData.salesStatus}
               onChange={handleChange}
             >
-              <MenuItem value="Sale">Sale</MenuItem>
-              <MenuItem value="Exchange">Exchange</MenuItem>
+              <MenuItem value="Sold">Sold</MenuItem>
+              <MenuItem value="Unsold">Unsold</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Maintenance Records"
+              name="maintenanceRecords"
+              multiline
+              rows={4}
+              value={formData.maintenanceRecords}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
@@ -95,11 +190,21 @@ export default function TradeModuleForm() {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Transaction Details"
-              name="transactionDetails"
+              label="Description"
+              name="description"
               multiline
               rows={4}
-              value={formData.transactionDetails}
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              label="Unique Identification Number"
+              name="uniqueIdentificationNumber"
+              value={formData.uniqueIdentificationNumber}
               onChange={handleChange}
             />
           </Grid>

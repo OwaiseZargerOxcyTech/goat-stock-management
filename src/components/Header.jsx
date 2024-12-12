@@ -40,13 +40,6 @@ function Header() {
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Button
               component={RouterLink}
-              to="/"
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              Dashboard
-            </Button>
-            <Button
-              component={RouterLink}
               to="/male-stock-list"
               sx={{ my: 2, color: "white", display: "block" }}
             >

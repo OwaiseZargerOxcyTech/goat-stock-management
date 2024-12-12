@@ -8,6 +8,7 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  MenuItem,
 } from "@mui/material";
 import api from "../api/config";
 import { CommonTable } from "./CommonTable";
@@ -65,9 +66,12 @@ const TradeList = () => {
 
   const columns = [
     { accessorKey: "goatName", header: "Goat Name" },
-    { accessorKey: "intendedUse", header: "Intended Use" },
+    { accessorKey: "purchaserInformation", header: "Purchaser Information" },
+    { accessorKey: "customerDetails", header: "Customer Details" },
+    { accessorKey: "weight", header: "Weight (kg)" },
+    { accessorKey: "height", header: "Height (cm)" },
+    { accessorKey: "salesStatus", header: "Sales Status" },
     { accessorKey: "price", header: "Price" },
-    { accessorKey: "transactionDetails", header: "Transaction Details" },
     {
       accessorKey: "actions",
       header: "Actions",
@@ -94,13 +98,14 @@ const TradeList = () => {
       ),
     },
   ];
+
   const navigate = useNavigate();
 
   return (
     <Box sx={{ m: 8 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h4" gutterBottom>
-          Trade List
+          Trade Stock List
         </Typography>
         <Button
           onClick={() => navigate("/add-trade")}
@@ -112,18 +117,53 @@ const TradeList = () => {
           Add
         </Button>
       </Box>
+
       <CommonTable columns={columns} data={data} />
 
       {/* Edit Dialog */}
       {openEditDialog && (
         <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-          <DialogTitle>Edit Trade</DialogTitle>
+          <DialogTitle>Edit Trade Stock</DialogTitle>
           <DialogContent>
             {Object.keys(editData || {}).map(
               (key) =>
                 key !== "id" &&
                 key !== "createdAt" &&
-                key !== "updatedAt" && (
+                key !== "updatedAt" &&
+                (key === "entryDate" || key === "exitDate" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={editData[key]?.split("T")[0] || ""}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  />
+                ) : key === "salesStatus" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  >
+                    <MenuItem value="sold">Sold</MenuItem>
+                    <MenuItem value="unsold">Unsold</MenuItem>
+                  </TextField>
+                ) : (
                   <TextField
                     key={key}
                     label={key}
@@ -137,7 +177,7 @@ const TradeList = () => {
                       }))
                     }
                   />
-                )
+                ))
             )}
           </DialogContent>
           <DialogActions>

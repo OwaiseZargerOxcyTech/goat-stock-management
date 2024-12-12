@@ -92,7 +92,7 @@ export default function FemaleStockForm() {
             <TextField
               required
               fullWidth
-              label="Purchaser Information"
+              label="Purchaser Details"
               name="purchaserInformation"
               value={formData.purchaserInformation}
               onChange={handleChange}
