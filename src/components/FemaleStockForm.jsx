@@ -24,6 +24,7 @@ export default function FemaleStockForm() {
     price: "",
     description: "",
     uniqueIdentificationNumber: "",
+    image: null,
     mateDate: "",
     pregnancyStatus: "",
     matingPartnerInformation: "",
@@ -31,6 +32,7 @@ export default function FemaleStockForm() {
 
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+  const [imageName, setImageName] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,11 +43,31 @@ export default function FemaleStockForm() {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setImageName(file.name);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/female-stock", formData);
+      const formDataObj = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "image" && value) {
+          formDataObj.append(key, value);
+        } else {
+          formDataObj.append(key, value || "");
+        }
+      });
+
+      await api.post("/female-stock", formDataObj, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setSnackbar({ open: true, message: "Female stock created successfully" });
       setFormData({
         goatName: "",
@@ -59,10 +81,12 @@ export default function FemaleStockForm() {
         price: "",
         description: "",
         uniqueIdentificationNumber: "",
+        image: null,
         mateDate: "",
         pregnancyStatus: "",
         matingPartnerInformation: "",
       });
+      setImageName("");
     } catch (error) {
       setSnackbar({ open: true, message: "Error creating female stock" });
     } finally {
@@ -235,6 +259,24 @@ export default function FemaleStockForm() {
               name="matingPartnerInformation"
               value={formData.matingPartnerInformation}
               onChange={handleChange}
+            />
+          </Grid>
+
+          {/* Image Upload Field */}
+          <Grid item xs={12}>
+            <label
+              htmlFor="image"
+              style={{ display: "block", marginBottom: "8px" }}
+            >
+              {imageName ? imageName : "Upload Goat Image"}
+            </label>
+            <TextField
+              type="file"
+              id="image"
+              name="image"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              onChange={handleImageChange}
             />
           </Grid>
         </Grid>
