@@ -21,9 +21,32 @@ const TradeList = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  const [openImageDialog, setOpenImageDialog] = useState(false);
+  const [imageData, setImageData] = useState(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imageName, setImageName] = useState("");
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  const fetchImage = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      const blob = await response.blob();
+      setImageData(URL.createObjectURL(blob));
+      setIsImageLoaded(true);
+      setOpenImageDialog(true);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -31,6 +54,14 @@ const TradeList = () => {
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImageFile(file);
+      setImageName(file.name);
     }
   };
 
@@ -46,7 +77,25 @@ const TradeList = () => {
 
   const handleEditSave = async () => {
     try {
-      await api.put(`/trade/${editData.id}`, editData);
+      const formDataObj = new FormData();
+
+      Object.entries(editData).forEach(([key, value]) => {
+        if (key === "image" && value) {
+        } else {
+          formDataObj.append(key, value || "");
+        }
+      });
+
+      if (selectedImageFile) {
+        formDataObj.append("image", selectedImageFile);
+      }
+
+      await api.put(`/trade/${editData.id}`, formDataObj, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       setOpenEditDialog(false);
       fetchData();
     } catch (error) {
@@ -94,6 +143,17 @@ const TradeList = () => {
           >
             Delete
           </Button>
+          {row.original.photographUrl && (
+            <Button
+              onClick={() => fetchImage(row.original.photographUrl)}
+              color="info"
+              variant="contained"
+              size="small"
+              style={{ marginLeft: "8px" }}
+            >
+              View Image
+            </Button>
+          )}
         </Box>
       ),
     },
@@ -179,6 +239,24 @@ const TradeList = () => {
                   />
                 ))
             )}
+
+            {/* Image Upload Field */}
+            <Box sx={{ mt: 2 }}>
+              <label
+                htmlFor="image"
+                style={{ display: "block", marginBottom: "8px" }}
+              >
+                {imageName ? imageName : "Upload Goat Image"}
+              </label>
+              <TextField
+                type="file"
+                id="image"
+                name="image"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                onChange={handleImageChange}
+              />
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
@@ -217,6 +295,26 @@ const TradeList = () => {
           </DialogActions>
         </Dialog>
       )}
+
+      <Dialog open={openImageDialog} onClose={() => setOpenImageDialog(false)}>
+        <DialogTitle>Goat Image</DialogTitle>
+        <DialogContent>
+          {isImageLoaded ? (
+            <img
+              src={imageData}
+              alt="Goat Image"
+              style={{ maxWidth: "100%", maxHeight: "400px" }}
+            />
+          ) : (
+            <Typography>Loading image...</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenImageDialog(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
