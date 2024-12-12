@@ -24,10 +24,12 @@ export default function MaleStockForm() {
     price: "",
     description: "",
     uniqueIdentificationNumber: "",
+    image: null,
   });
 
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+  const [imageName, setImageName] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,11 +40,33 @@ export default function MaleStockForm() {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setImageName(file.name);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/male-stock", formData);
+      const formDataObj = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "image" && value) {
+          formDataObj.append(key, value);
+        } else {
+          formDataObj.append(key, value || "");
+        }
+      });
+
+      console.log(formData);
+
+      await api.post("/male-stock", formDataObj, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setSnackbar({ open: true, message: "Male stock created successfully" });
       setFormData({
         goatName: "",
@@ -56,7 +80,9 @@ export default function MaleStockForm() {
         price: "",
         description: "",
         uniqueIdentificationNumber: "",
+        image: null,
       });
+      setImageName("");
     } catch (error) {
       setSnackbar({ open: true, message: "Error creating male stock" });
     } finally {
@@ -191,6 +217,24 @@ export default function MaleStockForm() {
               name="uniqueIdentificationNumber"
               value={formData.uniqueIdentificationNumber}
               onChange={handleChange}
+            />
+          </Grid>
+
+          {/* Image Upload Field */}
+          <Grid item xs={12}>
+            <label
+              htmlFor="image"
+              style={{ display: "block", marginBottom: "8px" }}
+            >
+              {imageName ? imageName : "Upload Goat Image"}
+            </label>
+            <TextField
+              type="file"
+              id="image"
+              name="image"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              onChange={handleImageChange}
             />
           </Grid>
         </Grid>
