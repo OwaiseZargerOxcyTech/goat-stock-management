@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -74,7 +75,21 @@ const MaleStockList = () => {
   };
 
   const handleDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const transformedData = data.map((row) => ({
+      ...row,
+      entryDate: row.entryDate
+        ? dayjs(row.entryDate).format("DD MMM YYYY")
+        : "",
+      exitDate: row.exitDate ? dayjs(row.exitDate).format("DD MMM YYYY") : "",
+      createdAt: row.createdAt
+        ? dayjs(row.createdAt).format("DD MMM YYYY")
+        : "",
+      updatedAt: row.updatedAt
+        ? dayjs(row.updatedAt).format("DD MMM YYYY")
+        : "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(transformedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "MaleStock");
     XLSX.writeFile(workbook, "MaleStockList.xlsx");
