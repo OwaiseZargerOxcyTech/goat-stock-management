@@ -10,6 +10,7 @@ import {
   Typography,
   MenuItem,
 } from "@mui/material";
+import * as XLSX from "xlsx";
 import api from "../api/config";
 import { CommonTable } from "./CommonTable";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +65,13 @@ const TradeList = () => {
     }
   };
 
+  const handleDownload = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "TradeStock");
+    XLSX.writeFile(workbook, "TradeStockList.xlsx");
+  };
+
   const columns = [
     { accessorKey: "goatName", header: "Goat Name" },
     { accessorKey: "purchaserInformation", header: "Purchaser Information" },
@@ -107,15 +115,26 @@ const TradeList = () => {
         <Typography variant="h4" gutterBottom>
           Trade Stock List
         </Typography>
-        <Button
-          onClick={() => navigate("/add-trade")}
-          color="primary"
-          variant="contained"
-          size="small"
-          sx={{ mb: 2 }}
-        >
-          Add
-        </Button>
+        <Box>
+          <Button
+            onClick={handleDownload}
+            color="secondary"
+            variant="contained"
+            size="small"
+            sx={{ mb: 2, marginRight: "8px" }}
+          >
+            Download
+          </Button>
+          <Button
+            onClick={() => navigate("/add-trade")}
+            color="primary"
+            variant="contained"
+            size="small"
+            sx={{ mb: 2 }}
+          >
+            Add
+          </Button>
+        </Box>
       </Box>
 
       <CommonTable columns={columns} data={data} />
