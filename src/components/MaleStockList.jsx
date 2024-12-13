@@ -128,17 +128,39 @@ const MaleStockList = () => {
 
   return (
     <Box sx={{ m: 8 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h4" gutterBottom>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: { xs: "center", sm: "space-between" },
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "center", sm: "flex-start" },
+          gap: { xs: 2, sm: 0 },
+          mb: { xs: 2, sm: 0 }, // Add margin below for mobile screens
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
+            textAlign: { xs: "center", sm: "left" },
+          }}
+        >
           Male Stock List
         </Typography>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: { xs: 2, sm: "8px" },
+          }}
+        >
           <Button
             onClick={handleDownload}
             color="secondary"
             variant="contained"
             size="small"
-            sx={{ mb: 2, marginRight: "8px" }}
+            sx={{ mb: { xs: 0, sm: 2 }, marginRight: { xs: 0, sm: "8px" } }}
           >
             Download
           </Button>
@@ -147,7 +169,7 @@ const MaleStockList = () => {
             color="primary"
             variant="contained"
             size="small"
-            sx={{ mb: 2 }}
+            sx={{ mb: { xs: 0, sm: 2 } }}
           >
             Add
           </Button>
