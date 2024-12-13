@@ -22,6 +22,9 @@ const FemaleStockList = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  const [viewData, setViewData] = useState(null);
+  const [openViewDialog, setOpenViewDialog] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -33,6 +36,11 @@ const FemaleStockList = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleViewClick = (row) => {
+    setViewData(row.original);
+    setOpenViewDialog(true);
   };
 
   const handleEditClick = (row) => {
@@ -101,13 +109,23 @@ const FemaleStockList = () => {
     {
       accessorKey: "actions",
       header: "Actions",
+      size: 300,
       Cell: ({ row }) => (
         <Box>
+          <Button
+            onClick={() => handleViewClick(row)}
+            color="info"
+            variant="contained"
+            size="small"
+          >
+            View
+          </Button>
           <Button
             onClick={() => handleEditClick(row)}
             color="primary"
             variant="contained"
             size="small"
+            style={{ marginLeft: "8px" }}
           >
             Edit
           </Button>
@@ -166,6 +184,7 @@ const FemaleStockList = () => {
                 key !== "id" &&
                 key !== "createdAt" &&
                 key !== "updatedAt" &&
+                key !== "photographUrl" &&
                 (key === "entryDate" ||
                 key === "exitDate" ||
                 key === "mateDate" ? (
@@ -198,9 +217,48 @@ const FemaleStockList = () => {
                       }))
                     }
                   >
-                    <MenuItem value="sold">Sold</MenuItem>
-                    <MenuItem value="unsold">Unsold</MenuItem>
+                    <MenuItem value="Sold">Sold</MenuItem>
+                    <MenuItem value="Unsold">Unsold</MenuItem>
                   </TextField>
+                ) : key === "pregnancyStatus" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  >
+                    <MenuItem value="1 Month Loaded">1 Month Loaded</MenuItem>
+                    <MenuItem value="2 Month Loaded">2 Month Loaded</MenuItem>
+                    <MenuItem value="3 Month Loaded">3 Month Loaded</MenuItem>
+                    <MenuItem value="4 Month Loaded">4 Month Loaded</MenuItem>
+                    <MenuItem value="5 Month Loaded">5 Month Loaded</MenuItem>
+                    <MenuItem value="Delivery done">Delivery done</MenuItem>
+                    <MenuItem value="Fresh">Fresh</MenuItem>
+                  </TextField>
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    multiline
+                    rows={3} // Set to 3 rows
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  />
                 ) : (
                   <TextField
                     key={key}
@@ -252,6 +310,63 @@ const FemaleStockList = () => {
             >
               Delete
             </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {openViewDialog && (
+        <Dialog open={openViewDialog} onClose={() => setOpenViewDialog(false)}>
+          <DialogTitle>View Female Stock</DialogTitle>
+          <DialogContent>
+            {Object.keys(viewData || {}).map(
+              (key) =>
+                key !== "id" &&
+                key !== "createdAt" &&
+                key !== "updatedAt" &&
+                key !== "photographUrl" &&
+                (key === "entryDate" ||
+                key === "exitDate" ||
+                key === "mateDate" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key]?.split("T")[0] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    multiline
+                    rows={3} // Set to 3 rows
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ))
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenViewDialog(false)}>Close</Button>
           </DialogActions>
         </Dialog>
       )}

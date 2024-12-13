@@ -22,6 +22,9 @@ const TradeList = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  const [viewData, setViewData] = useState(null);
+  const [openViewDialog, setOpenViewDialog] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -33,6 +36,11 @@ const TradeList = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleViewClick = (row) => {
+    setViewData(row.original);
+    setOpenViewDialog(true);
   };
 
   const handleEditClick = (row) => {
@@ -83,13 +91,23 @@ const TradeList = () => {
     {
       accessorKey: "actions",
       header: "Actions",
+      size: 300,
       Cell: ({ row }) => (
         <Box>
+          <Button
+            onClick={() => handleViewClick(row)}
+            color="info"
+            variant="contained"
+            size="small"
+          >
+            View
+          </Button>
           <Button
             onClick={() => handleEditClick(row)}
             color="primary"
             variant="contained"
             size="small"
+            style={{ marginLeft: "8px" }}
           >
             Edit
           </Button>
@@ -149,6 +167,7 @@ const TradeList = () => {
                 key !== "id" &&
                 key !== "createdAt" &&
                 key !== "updatedAt" &&
+                key !== "photographUrl" &&
                 (key === "entryDate" || key === "exitDate" ? (
                   <TextField
                     key={key}
@@ -179,9 +198,25 @@ const TradeList = () => {
                       }))
                     }
                   >
-                    <MenuItem value="sold">Sold</MenuItem>
-                    <MenuItem value="unsold">Unsold</MenuItem>
+                    <MenuItem value="Sold">Sold</MenuItem>
+                    <MenuItem value="Unsold">Unsold</MenuItem>
                   </TextField>
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    multiline
+                    rows={3} // Set to 3 rows
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  />
                 ) : (
                   <TextField
                     key={key}
@@ -232,6 +267,63 @@ const TradeList = () => {
               variant="contained"
             >
               Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {openViewDialog && (
+        <Dialog open={openViewDialog} onClose={() => setOpenViewDialog(false)}>
+          <DialogTitle>View Trade Stock</DialogTitle>
+          <DialogContent>
+            {Object.keys(viewData || {}).map(
+              (key) =>
+                key !== "id" &&
+                key !== "createdAt" &&
+                key !== "updatedAt" &&
+                key !== "photographUrl" &&
+                (key === "entryDate" || key === "exitDate" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key]?.split("T")[0] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    multiline
+                    rows={3}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ))
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenViewDialog(false)} color="primary">
+              Close
             </Button>
           </DialogActions>
         </Dialog>
