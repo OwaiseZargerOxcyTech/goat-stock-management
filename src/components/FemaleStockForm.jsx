@@ -226,6 +226,8 @@ export default function FemaleStockForm() {
               <MenuItem value="3 Month Loaded">3 Month Loaded</MenuItem>
               <MenuItem value="4 Month Loaded">4 Month Loaded</MenuItem>
               <MenuItem value="5 Month Loaded">5 Month Loaded</MenuItem>
+              <MenuItem value="Delivery done">Delivery done</MenuItem>
+              <MenuItem value="Fresh">Fresh</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12}>

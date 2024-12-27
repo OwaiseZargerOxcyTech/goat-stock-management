@@ -16,80 +16,88 @@ function Header() {
   return (
     <AppBar position="static" color="primary">
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography
-              variant="h6"
-              noWrap
-              component={RouterLink}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              GOAT STOCK
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Button
-              component={RouterLink}
-              to="/male-stock-list"
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              Male Stock
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/female-stock-list"
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              Female Stock
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/trade-list"
-              sx={{ my: 2, color: "white", display: "block" }}
-            >
-              Trade
-            </Button>
-            {isAuthenticated && (
-              <Button
-                onClick={logout}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                Logout
-              </Button>
-            )}
-          </Box>
-
-          <Box
-            sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}
+        <Toolbar
+          disableGutters
+          sx={{
+            flexDirection: { xs: "column", md: "row" }, // Column for small screens, row for large screens
+            justifyContent: { xs: "center", md: "space-between" }, // Center align on small screens, space-between on large screens
+            alignItems: "center",
+          }}
+        >
+          {/* Title */}
+          <Typography
+            variant="h6"
+            noWrap
+            component={RouterLink}
+            to="/"
+            sx={{
+              mb: { xs: 2, md: 0 }, // Add margin below title for small screens
+              fontFamily: "monospace",
+              fontWeight: 700,
+              letterSpacing: ".3rem",
+              color: "inherit",
+              textDecoration: "none",
+              textAlign: { xs: "center", md: "left" }, // Center text on small screens, left align on large screens
+            }}
           >
-            <Typography
-              variant="h5"
-              noWrap
-              component={RouterLink}
-              to="/"
+            GOAT STOCK
+          </Typography>
+
+          {/* Buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" }, // Stack buttons on small screens, horizontal on large screens
+              alignItems: { xs: "center", md: "center" }, // Center align on both small and large screens
+              justifyContent: { xs: "center", md: "flex-end" }, // Buttons move to the right on large screens
+              gap: { xs: 2, md: 1 }, // Add spacing between buttons
+              width: { xs: "100%", md: "auto" }, // Full width on small screens
+            }}
+          >
+            <Box
               sx={{
-                mr: 2,
-                display: { xs: "flex", md: "none" },
-                flexGrow: 1,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                width: { xs: "100%", md: "auto" },
               }}
             >
-              GOAT STOCK
-            </Typography>
+              <Button
+                component={RouterLink}
+                to="/male-stock-list"
+                sx={{ color: "white" }}
+              >
+                Male Stock
+              </Button>
+              <Button
+                component={RouterLink}
+                to="/female-stock-list"
+                sx={{ color: "white" }}
+              >
+                Female Stock
+              </Button>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                width: { xs: "100%", md: "auto" },
+              }}
+            >
+              <Button
+                component={RouterLink}
+                to="/trade-list"
+                sx={{ color: "white" }}
+              >
+                Trade
+              </Button>
+              {isAuthenticated && (
+                <Button onClick={logout} sx={{ color: "white" }}>
+                  Logout
+                </Button>
+              )}
+            </Box>
           </Box>
         </Toolbar>
       </Container>

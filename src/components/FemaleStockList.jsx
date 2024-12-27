@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -22,6 +23,9 @@ const FemaleStockList = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  const [viewData, setViewData] = useState(null);
+  const [openViewDialog, setOpenViewDialog] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -33,6 +37,11 @@ const FemaleStockList = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleViewClick = (row) => {
+    setViewData(row.original);
+    setOpenViewDialog(true);
   };
 
   const handleEditClick = (row) => {
@@ -66,7 +75,22 @@ const FemaleStockList = () => {
   };
 
   const handleDownload = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const transformedData = data.map((row) => ({
+      ...row,
+      entryDate: row.entryDate
+        ? dayjs(row.entryDate).format("DD MMM YYYY")
+        : "",
+      exitDate: row.exitDate ? dayjs(row.exitDate).format("DD MMM YYYY") : "",
+      mateDate: row.mateDate ? dayjs(row.mateDate).format("DD MMM YYYY") : "",
+      createdAt: row.createdAt
+        ? dayjs(row.createdAt).format("DD MMM YYYY")
+        : "",
+      updatedAt: row.updatedAt
+        ? dayjs(row.updatedAt).format("DD MMM YYYY")
+        : "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(transformedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "FemaleStock");
     XLSX.writeFile(workbook, "FemaleStockList.xlsx");
@@ -101,13 +125,23 @@ const FemaleStockList = () => {
     {
       accessorKey: "actions",
       header: "Actions",
+      size: 300,
       Cell: ({ row }) => (
         <Box>
+          <Button
+            onClick={() => handleViewClick(row)}
+            color="info"
+            variant="contained"
+            size="small"
+          >
+            View
+          </Button>
           <Button
             onClick={() => handleEditClick(row)}
             color="primary"
             variant="contained"
             size="small"
+            style={{ marginLeft: "8px" }}
           >
             Edit
           </Button>
@@ -129,17 +163,39 @@ const FemaleStockList = () => {
 
   return (
     <Box sx={{ m: 8 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h4" gutterBottom>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: { xs: "center", sm: "space-between" },
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "center", sm: "flex-start" },
+          gap: { xs: 2, sm: 0 },
+          mb: { xs: 2, sm: 0 }, // Add margin below for mobile screens
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
+            textAlign: { xs: "center", sm: "left" },
+          }}
+        >
           Female Stock List
         </Typography>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "center",
+            gap: { xs: 2, sm: "8px" },
+          }}
+        >
           <Button
             onClick={handleDownload}
             color="secondary"
             variant="contained"
             size="small"
-            sx={{ mb: 2, marginRight: "8px" }}
+            sx={{ mb: { xs: 0, sm: 2 }, marginRight: { xs: 0, sm: "8px" } }}
           >
             Download
           </Button>
@@ -148,12 +204,13 @@ const FemaleStockList = () => {
             color="primary"
             variant="contained"
             size="small"
-            sx={{ mb: 2 }}
+            sx={{ mb: { xs: 0, sm: 2 } }}
           >
             Add
           </Button>
         </Box>
       </Box>
+
       <CommonTable columns={columns} data={data} />
 
       {/* Edit Dialog */}
@@ -166,6 +223,7 @@ const FemaleStockList = () => {
                 key !== "id" &&
                 key !== "createdAt" &&
                 key !== "updatedAt" &&
+                key !== "photographUrl" &&
                 (key === "entryDate" ||
                 key === "exitDate" ||
                 key === "mateDate" ? (
@@ -198,9 +256,48 @@ const FemaleStockList = () => {
                       }))
                     }
                   >
-                    <MenuItem value="sold">Sold</MenuItem>
-                    <MenuItem value="unsold">Unsold</MenuItem>
+                    <MenuItem value="Sold">Sold</MenuItem>
+                    <MenuItem value="Unsold">Unsold</MenuItem>
                   </TextField>
+                ) : key === "pregnancyStatus" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    select
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  >
+                    <MenuItem value="1 Month Loaded">1 Month Loaded</MenuItem>
+                    <MenuItem value="2 Month Loaded">2 Month Loaded</MenuItem>
+                    <MenuItem value="3 Month Loaded">3 Month Loaded</MenuItem>
+                    <MenuItem value="4 Month Loaded">4 Month Loaded</MenuItem>
+                    <MenuItem value="5 Month Loaded">5 Month Loaded</MenuItem>
+                    <MenuItem value="Delivery done">Delivery done</MenuItem>
+                    <MenuItem value="Fresh">Fresh</MenuItem>
+                  </TextField>
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={editData[key] || ""}
+                    multiline
+                    rows={3} // Set to 3 rows
+                    onChange={(e) =>
+                      setEditData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                  />
                 ) : (
                   <TextField
                     key={key}
@@ -252,6 +349,63 @@ const FemaleStockList = () => {
             >
               Delete
             </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      {openViewDialog && (
+        <Dialog open={openViewDialog} onClose={() => setOpenViewDialog(false)}>
+          <DialogTitle>View Female Stock</DialogTitle>
+          <DialogContent>
+            {Object.keys(viewData || {}).map(
+              (key) =>
+                key !== "id" &&
+                key !== "createdAt" &&
+                key !== "updatedAt" &&
+                key !== "photographUrl" &&
+                (key === "entryDate" ||
+                key === "exitDate" ||
+                key === "mateDate" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key]?.split("T")[0] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : key === "description" || key === "maintenanceRecords" ? (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    multiline
+                    rows={3} // Set to 3 rows
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ) : (
+                  <TextField
+                    key={key}
+                    label={key}
+                    fullWidth
+                    margin="dense"
+                    value={viewData[key] || ""}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                ))
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenViewDialog(false)}>Close</Button>
           </DialogActions>
         </Dialog>
       )}
