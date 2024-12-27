@@ -38,7 +38,7 @@ const AdminLogin = () => {
         style={{ padding: "2rem", width: "100%", maxWidth: "400px" }}
       >
         <Typography variant="h4" gutterBottom align="center">
-          Admin Login
+          Admin Login is the best
         </Typography>
         <TextField
           label="Username"
