@@ -62,7 +62,7 @@ const AdminLogin = () => {
         )}
         <Button
           variant="contained"
-          color="primary"
+          color="secondary"
           fullWidth
           style={{ marginTop: "1rem" }}
           onClick={handleLogin}
